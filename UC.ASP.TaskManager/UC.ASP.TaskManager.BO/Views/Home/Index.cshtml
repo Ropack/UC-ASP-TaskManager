@@ -1,8 +1,13 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@page
+<div class="container">
+    <h2>Issue count: </h2>
+    <span id="issuesCount"></span>
+    <h2>List of issues</h2>
+    <div>
+        <ul id="issuesList">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        </ul>
+    </div>
 </div>
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+@*<script src="~/js/chat.js"></script>*@

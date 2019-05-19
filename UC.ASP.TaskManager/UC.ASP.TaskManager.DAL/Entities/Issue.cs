@@ -12,6 +12,7 @@ namespace UC.ASP.TaskManager.DAL.Entities
         public string Description { get; set; }
         public bool Resolved { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string UserEmail { get; set; }
         
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; }

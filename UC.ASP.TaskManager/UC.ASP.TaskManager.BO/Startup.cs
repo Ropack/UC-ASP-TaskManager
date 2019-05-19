@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using UC.ASP.TaskManager.BL;
 using UC.ASP.TaskManager.BL.Installers;
+using UC.ASP.TaskManager.BO.Hubs;
 using UC.ASP.TaskManager.DAL;
 
 namespace UC.ASP.TaskManager.BO
@@ -32,6 +33,13 @@ namespace UC.ASP.TaskManager.BO
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            }));
             var container = new WindsorContainer();
             container.AddFacility<AspNetCoreFacility>(f => f.CrossWiresInto(services));
             container.AddFacility<TypedFactoryFacility>();
@@ -48,6 +56,9 @@ namespace UC.ASP.TaskManager.BO
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSignalR();
+
             container.Install(
                 FromAssembly.Containing<Startup>(),
                 FromAssembly.Containing<DataAccessInstaller>());
@@ -57,6 +68,7 @@ namespace UC.ASP.TaskManager.BO
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -71,7 +83,10 @@ namespace UC.ASP.TaskManager.BO
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<IssuesHub>("/issuesHub");
+            });
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

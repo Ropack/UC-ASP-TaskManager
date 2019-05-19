@@ -4,32 +4,74 @@ interface IProps {
 }
 
 interface IState {
-    count: number;
+    selectedProductId: number;
+    selectedGroupId: number;
+    products: { productId: number, name: string }[];
 }
 
 class Issue extends React.Component<IProps, IState> {
-    public static defaultProps: IProps = {
-        countBy: 1,
+    constructor(props: IProps) {
+        super(props);
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        
+        this.api<[{ productId: number; name: string }]>('https://localhost:44345/issues/GetProducts?groupId=1')
+            .then((products: [{ productId: number, name: string }]) => {
+                this.state.products = products;
+            })
+            .catch(error => {
+                /* show error message */
+            });
+    }
+
+    state: IState = {
+        products: [],
+        selectedGroupId: 0,
+        selectedProductId: 0
     };
 
-    public state: IState = {
-        count: 0,
-    };
+    api<T>(url: string): Promise<T> {
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json() as Promise<T>;
+            });
+    }
 
-    public increase = () => {
-        const countBy: number = this.props.countBy!;
-        const count = this.state.count + countBy;
-        this.setState({ count });
-    };
+    handleChange(event: any) {
+        this.setState({ selectedProductId: event.target.value });
+    }
 
-    public 
+    handleSubmit(event: any) {
+        alert('Your favorite flavor is: ' + this.state.selectedProductId);
+        event.preventDefault();
+    }
 
-    public render() {
+    getOptions = () => {
+        let options = [];
+        for (let product of this.state.products) {
+            let opt = document.createElement("option");
+            opt.value = product.productId.toString();
+            opt.innerHTML = product.name;
+            options.push(opt);
+        }
+        return options;
+    }
+
+    render() {
         return (
-            <div>
-                <p>My favorite number is {this.state.count} </p>
-                <button onClick={this.increase} > Increase </button>
-            </div>
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Pick your favorite flavor:
+                    <select value={this.state.selectedProductId} onChange={this.handleChange}>
+                        {this.getOptions()}
+                    </select>
+                </label>
+                <input type="submit" value="Submit" />
+            </form>
         );
     }
 }

@@ -24,5 +24,6 @@ namespace UC.ASP.TaskManager.BL.Repositories
 
         void Update(IEnumerable<TEntity> entities);
         IList<TEntity> GetAll();
+        int GetCount();
     }
 }

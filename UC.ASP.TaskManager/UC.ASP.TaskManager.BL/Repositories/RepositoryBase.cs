@@ -108,5 +108,10 @@ namespace UC.ASP.TaskManager.BL.Repositories
                 Delete(entity);
             }
         }
+
+        public int GetCount()
+        {
+            return Context.Set<TEntity>().Count();
+        }
     }
 }
